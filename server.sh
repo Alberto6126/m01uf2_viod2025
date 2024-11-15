@@ -7,7 +7,7 @@ echo "ESCUCHANDO EL PUERTO $PUERTO"
 BUCLE_SERVER=1
 
 while [ $BUCLE_SERVER == 1 ]; do
-
+	SERVERISWAITING=0
 	CABECERA=`ncat -l localhost $PUERTO`
 	CABECERA_FILENAME=$( echo "$CABECERA" | cut -b 1-14 )
 	CABECERA_NOMBRE=$( echo "$CABECERA" | cut -b 16- )
@@ -18,6 +18,11 @@ while [ $BUCLE_SERVER == 1 ]; do
 		 echo "OK HEADER" | ncat localhost $PUERTO
 		 echo "SE HA RECIBIDO EL ARCHIVO $CABECERA_NOMBRE"
 		 echo "ERROR_0: Cabecera correcta" | ncat localhost $PUERTO
+		 SERVERISWAITING=1
+		 if [ "$SERVERISWAIRING" == 1 ]; then 
+			 DATA=`ncat -l $PUERTO`
+			 cat "$DATA" | ncat localhost $PUERTO
+		fi
 	else
 		echo "ERROR_1: Cabecera incorrecta"
 		echo "KO_HEADER" | ncat localhost $PUERTO
@@ -25,6 +30,7 @@ while [ $BUCLE_SERVER == 1 ]; do
 		echo "ERROR_1: Cabecera incorrecta" | ncat localhost $PUERTO
 		if [ "$CABECERA" == "101" ]; then
  		BUCLE_SERVER=0
+		fi
 	fi
-	fi
+
 done

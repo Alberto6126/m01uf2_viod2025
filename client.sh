@@ -25,5 +25,11 @@ ERROR_SERVER=`ncat -l localhost $PUERTO`
 		 BUCLE=0
 	fi
 echo "----------------------------------------------------------------------------"
+	if [ $BUCLE == 1 ]; then
+		cat client/dragon.txt | ncat $IPV4 $PUERTO
+		DATA=`ncat -l $PUERTO`
+		cat $DATA > dragon_server.txt
+
+	fi
 sleep 3
 done
