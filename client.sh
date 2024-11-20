@@ -1,22 +1,23 @@
 #!/bin/bash
 
+IPserver=$1
 clear 
-IPV4=localhost 
+IPlocal=localhost 
+IPhost=`ip ad | grep "scope global" | xargs | cut -d " " -f 2 | cut -d "/" -f 1`
 PUERTO=2022
 BUCLE=1
+CABECERA="DMAM $IPhost FILE_NAME"
 while [ $BUCLE == 1 ]; do
 clear
 echo "----------------------------------------------------------------------------"
 echo "envia la cabecera DMAM FILE_NAME seguido del nombre del archivo para completar la conexión, envia otra para interrumpirla"
-
-read CABECERA
-echo "enviando cabecera $CABECERA a $IPV4 en el puerto $PUERTO"
+echo "enviando cabecera $CABECERA a $IPserver en el puerto $PUERTO desde $IPhost"
 sleep 1
-echo $CABECERA | ncat $IPV4 $PUERTO
+echo $CABECERA | ncat $IPserver $PUERTO
 echo "----------------------------------------------------------------------------"
 echo "recibiendo cabecera del servidor"
-CABECERA_SERVER=`ncat -l localhost $PUERTO`
-ERROR_SERVER=`ncat -l localhost $PUERTO`
+CABECERA_SERVER=`ncat -l $IPhost $PUERTO`
+ERROR_SERVER=`ncat -l $IPhost $PUERTO`
  	if [ "$CABECERA_SERVER" == "OK HEADER" ]; then
 		 echo "la cabecera recibida es $CABECERA_SERVER, CONEXIÓN COMPLETADA"
 	else
@@ -26,9 +27,9 @@ ERROR_SERVER=`ncat -l localhost $PUERTO`
 	fi
 echo "----------------------------------------------------------------------------"
 	if [ $BUCLE == 1 ]; then
-		cat client/dragon.txt | ncat $IPV4 $PUERTO
+		cat client/dragon.txt | ncat $IPserver $PUERTO
 		DATA=`ncat -l $PUERTO`
-		cat $DATA > dragon_server.txt
+		echo $DATA > dragon_server.txt
 
 	fi
 sleep 3
